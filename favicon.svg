@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e1b4b" />
+    </linearGradient>
+
+    <!-- Atom Nucleus Gradient -->
+    <linearGradient id="atomGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+
+    <!-- Property Vector Gradient -->
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#a855f7" />
+    </linearGradient>
+
+    <!-- Glow Effect -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Main Container Card -->
+  <rect x="24" y="24" width="464" height="464" rx="100" fill="url(#bgGrad)" stroke="#334155" stroke-width="8" />
+
+  <!-- Periodic Grid Mini-Representation -->
+  <g transform="translate(75, 75)">
+    <rect x="0" y="0" width="55" height="55" rx="12" fill="#06b6d4" opacity="0.9" />
+    <rect x="65" y="0" width="55" height="55" rx="12" fill="#1e293b" stroke="#334155" stroke-width="4" />
+    <rect x="0" y="65" width="55" height="55" rx="12" fill="#1e293b" stroke="#334155" stroke-width="4" />
+    <rect x="65" y="65" width="55" height="55" rx="12" fill="#ec4899" opacity="0.9" />
+  </g>
+
+  <!-- Atom Structure -->
+  <g transform="translate(300, 290)">
+    <!-- Orbital 1 -->
+    <ellipse cx="0" cy="0" rx="140" ry="52" fill="none" stroke="#38bdf8" stroke-width="12" stroke-dasharray="18 10" transform="rotate(-30)" />
+    <!-- Orbital 2 -->
+    <ellipse cx="0" cy="0" rx="140" ry="52" fill="none" stroke="#ec4899" stroke-width="12" transform="rotate(35)" />
+    
+    <!-- Nucleus -->
+    <circle cx="0" cy="0" r="34" fill="url(#atomGrad)" filter="url(#glow)" />
+    <circle cx="-8" cy="-8" r="10" fill="#ffffff" opacity="0.85" />
+    
+    <!-- Electrons -->
+    <circle cx="120" cy="-62" r="16" fill="#06b6d4" filter="url(#glow)" />
+    <circle cx="-120" cy="-62" r="16" fill="#ec4899" filter="url(#glow)" />
+  </g>
+
+  <!-- Periodic Property Trend Axis & Arrow -->
+  <path d="M 65 425 L 435 425 L 435 65" fill="none" stroke="url(#arrowGrad)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Arrowhead -->
+  <path d="M 400 100 L 435 65 L 470 100" fill="none" stroke="url(#arrowGrad)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
