@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="ca" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Propietats Periòdiques - 2n Batxillerat (PAU)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            chemistry: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+              950: '#052e16',
+            },
+            darkbg: '#0f172a',
+            cardbg: '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Grid layout per a la Taula Periòdica (18 columnes) */
+    .ptable-grid {
+      display: grid;
+      grid-template-columns: repeat(18, minmax(28px, 1fr));
+      gap: 3px;
+    }
+    @media (max-width: 768px) {
+      .ptable-grid {
+        grid-template-columns: repeat(18, minmax(18px, 1fr));
+        gap: 1.5px;
+      }
+    }
+    /* Estils de les cel·les dels elements */
+    .element-cell {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      position: relative;
+    }
+    .element-cell:hover {
+      transform: scale(1.15);
+      z-index: 20;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    /* Element seleccionat o comparat */
+    .element-cell.compared-a {
+      ring: 3px solid #3b82f6;
+      background-color: #1d4ed8 !important;
+      color: white !important;
+      animation: pulse-blue 2s infinite;
+    }
+    .element-cell.compared-b {
+      ring: 3px solid #ec4899;
+      background-color: #be185d !important;
+      color: white !important;
+      animation: pulse-pink 2s infinite;
+    }
+    @keyframes pulse-blue {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+    }
+    @keyframes pulse-pink {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); }
+    }
+  </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen flex flex-col">
+
+  <!-- HEADER NAVEGACIÓ -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="p-2 bg-emerald-600/20 text-emerald-400 rounded-lg border border-emerald-500/30">
+          <i class="fa-solid fa-atom text-2xl animate-spin" style="animation-duration: 12s;"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">
+            Propietats Periòdiques
+          </h1>
+          <p class="text-xs text-slate-400">Química 2n Batxillerat • Preparació PAU</p>
+        </div>
+      </div>
+
+      <!-- PESTANYES DE NAVEGACIÓ -->
+      <nav class="flex space-x-1 bg-slate-800/80 p-1 rounded-xl border border-slate-700/50">
+        <button onclick="switchTab('quiz')" id="tab-quiz" class="px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-lg">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>Posa't a Prova</span>
+        </button>
+        <button onclick="switchTab('theory')" id="tab-theory" class="px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i class="fa-solid fa-book-open"></i>
+          <span>Resum Teoria PAU</span>
+        </button>
+        <button onclick="switchTab('table')" id="tab-table" class="px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50">
+          <i class="fa-solid fa-table-cells"></i>
+          <span>Taula Periòdica</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- CONTINGUT PRINCIPAL -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- ==================== PESTANYA 1: QUIZ / POSA'T A PROVA ==================== -->
+    <section id="section-quiz" class="space-y-6">
+      
+      <!-- MARCADOR I FILTRES -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        
+        <!-- Puntuació -->
+        <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-4 flex items-center justify-around shadow-xl">
+          <div class="text-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Encerts</span>
+            <span id="score-correct" class="text-2xl font-bold text-emerald-400">0</span>
+          </div>
+          <div class="h-8 w-px bg-slate-700"></div>
+          <div class="text-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Ratxa</span>
+            <span id="score-streak" class="text-2xl font-bold text-amber-400">0 🔥</span>
+          </div>
+          <div class="h-8 w-px bg-slate-700"></div>
+          <div class="text-center">
+            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Efectivitat</span>
+            <span id="score-accuracy" class="text-2xl font-bold text-cyan-400">-%</span>
+          </div>
+        </div>
+
+        <!-- Opcions de Filtre -->
+        <div class="lg:col-span-3 bg-cardbg border border-slate-700/60 rounded-2xl p-4 flex flex-wrap items-center gap-4 justify-between shadow-xl">
+          <div class="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Filtre de Relació</label>
+              <select id="modeFilter" onchange="resetAndGenerate()" class="bg-slate-900 text-slate-200 border border-slate-700 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:border-emerald-500">
+                <option value="both">Barrejat (Mateix Grup o Període)</option>
+                <option value="group">Només Mateix Grup</option>
+                <option value="period">Només Mateix Període</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-400 mb-1">Propietat Periòdica</label>
+              <select id="propFilter" onchange="resetAndGenerate()" class="bg-slate-900 text-slate-200 border border-slate-700 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:border-emerald-500">
+                <option value="random">Totes les propietats (Atzar)</option>
+                <option value="radius">Radi Atòmic</option>
+                <option value="ie">Energia d'Ionització</option>
+                <option value="en">Electronegativitat</option>
+                <option value="ea">Afinitat Electrònica</option>
+              </select>
+            </div>
+          </div>
+
+          <button onclick="generateQuestion()" class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            <span>Nova Pregunta</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- PREGUNTA PRINCIPAL CARD -->
+      <div class="bg-cardbg border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+        
+        <!-- Badge indicador de la prova -->
+        <div class="flex items-center justify-between mb-6">
+          <span id="badge-relation" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+            Carregant...
+          </span>
+          <span id="badge-property" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+            Propietat
+          </span>
+        </div>
+
+        <!-- ENUNCIAT EXACTE -->
+        <div class="text-center max-w-2xl mx-auto mb-8">
+          <h2 id="question-text" class="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+            Quin d'aquests dos àtoms té un valor major de ...?
+          </h2>
+          <p class="text-slate-400 text-sm mt-2">
+            Tria l'àtom correcte i revisa la justificació teòrica pas a pas segons el criteri oficial de les PAU.
+          </p>
+        </div>
+
+        <!-- TARGETES DELS DOS ELEMENTS A COMPARAR -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          
+          <!-- Element A -->
+          <button id="btn-elem-a" onclick="checkAnswer('A')" class="group relative bg-slate-900/90 hover:bg-slate-800/90 border-2 border-slate-700 hover:border-blue-500 rounded-2xl p-6 text-left transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-6">
+            <div class="w-20 h-20 bg-blue-600/20 border-2 border-blue-500 rounded-xl flex flex-col items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+              <span id="elem-a-z" class="text-xs text-blue-300 font-mono">Z=--</span>
+              <span id="elem-a-symbol" class="text-3xl font-black">--</span>
+            </div>
+            <div>
+              <h3 id="elem-a-name" class="text-xl font-bold text-white group-hover:text-blue-400 transition-colors">--</h3>
+              <p id="elem-a-pos" class="text-xs text-slate-400 font-mono mt-1">Període -, Grup -</p>
+              <p id="elem-a-config" class="text-xs text-slate-500 font-mono mt-0.5">Config: --</p>
+            </div>
+            <div id="badge-choice-a" class="hidden absolute top-3 right-3 text-2xl"></div>
+          </button>
+
+          <!-- Element B -->
+          <button id="btn-elem-b" onclick="checkAnswer('B')" class="group relative bg-slate-900/90 hover:bg-slate-800/90 border-2 border-slate-700 hover:border-pink-500 rounded-2xl p-6 text-left transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-6">
+            <div class="w-20 h-20 bg-pink-600/20 border-2 border-pink-500 rounded-xl flex flex-col items-center justify-center text-pink-400 group-hover:scale-105 transition-transform">
+              <span id="elem-b-z" class="text-xs text-pink-300 font-mono">Z=--</span>
+              <span id="elem-b-symbol" class="text-3xl font-black">--</span>
+            </div>
+            <div>
+              <h3 id="elem-b-name" class="text-xl font-bold text-white group-hover:text-pink-400 transition-colors">--</h3>
+              <p id="elem-b-pos" class="text-xs text-slate-400 font-mono mt-1">Període -, Grup -</p>
+              <p id="elem-b-config" class="text-xs text-slate-500 font-mono mt-0.5">Config: --</p>
+            </div>
+            <div id="badge-choice-b" class="hidden absolute top-3 right-3 text-2xl"></div>
+          </button>
+
+        </div>
+
+        <!-- SECCIÓ DE FEEDBACK I JUSTIFICACIÓ DIDÀCTICA PAU -->
+        <div id="feedback-container" class="hidden mt-8 max-w-3xl mx-auto rounded-2xl border p-6 transition-all">
+          
+          <div class="flex items-center space-x-3 mb-4">
+            <div id="feedback-icon" class="text-2xl"></div>
+            <h3 id="feedback-title" class="text-lg font-bold"></h3>
+          </div>
+
+          <div id="feedback-content" class="space-y-4 text-sm text-slate-200">
+            <!-- Emplenat dinàmicament -->
+          </div>
+
+          <!-- Dades experimentals -->
+          <div id="feedback-data" class="mt-4 pt-4 border-t border-slate-700/60 grid grid-cols-2 gap-4 text-xs font-mono text-slate-300">
+            <!-- Valors reals -->
+          </div>
+
+          <div class="mt-6 text-center">
+            <button onclick="generateQuestion()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold shadow-lg transition-all flex items-center space-x-2 mx-auto">
+              <span>Següent Pregunta</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAULA PERIÒDICA DE SUPORT PER AL TEST -->
+      <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-4 shadow-xl">
+        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+          <span>Ubicació dels elements a la Taula Periòdica</span>
+          <span class="text-slate-500 font-normal">Blau = Primer Àtom • Rosa = Segon Àtom</span>
+        </h4>
+        <div id="mini-ptable" class="ptable-grid overflow-x-auto pb-2">
+          <!-- Es genera dinàmicament -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== PESTANYA 2: RESUM TEORIA PAU ==================== -->
+    <section id="section-theory" class="hidden space-y-6">
+      
+      <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-2xl font-bold text-emerald-400 mb-2 flex items-center space-x-2">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span>Guia d'Argumentació per a les Proves PAU</span>
+        </h2>
+        <p class="text-slate-300 text-sm leading-relaxed">
+          Als exàmens de Química de 2n de Batxillerat, no n'hi ha prou amb dir quin element té un valor superior. És <b>imprescindible argumentar en funció de la posició a la taula</b>, diferenciant clarament si es tracta d'elements del <b>mateix grup</b> o del <b>mateix període</b>.
+        </p>
+      </div>
+
+      <!-- GRID DE CONCEPTES CLAU -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Mateix Període -->
+        <div class="bg-cardbg border border-blue-500/30 rounded-2xl p-6 space-y-4 shadow-lg">
+          <div class="flex items-center space-x-3 text-blue-400">
+            <i class="fa-solid fa-arrows-left-right text-xl"></i>
+            <h3 class="text-lg font-bold">1. Comparació al Mateix Període</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start space-x-2">
+              <span class="text-blue-400 font-bold">•</span>
+              <span><b>Nombre de capes (<i>n</i>):</b> Es manté constant (tots els electrons de valència estan al mateix nivell principal).</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-blue-400 font-bold">•</span>
+              <span><b>Càrrega Nuclear (<i>Z</i>):</b> Augmenta d'esquerra a dreta (més protons al nucli).</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-blue-400 font-bold">•</span>
+              <span><b>Efecte Pantalla (<i>S</i>):</b> Com que els electrons s'afegeixen a la mateixa capa, l'apantallament varia molt poc.</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-blue-400 font-bold">•</span>
+              <span><b>Conclusió PAU:</b> La <b>càrrega nuclear efectiva (Z<sub>eff</sub> = Z - S) augmenta cap a la dreta</b>. El nucli atreu els electrons de valència amb més força.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Mateix Grup -->
+        <div class="bg-cardbg border border-purple-500/30 rounded-2xl p-6 space-y-4 shadow-lg">
+          <div class="flex items-center space-x-3 text-purple-400">
+            <i class="fa-solid fa-arrows-up-down text-xl"></i>
+            <h3 class="text-lg font-bold">2. Comparació al Mateix Grup</h3>
+          </div>
+          <ul class="space-y-3 text-sm text-slate-300">
+            <li class="flex items-start space-x-2">
+              <span class="text-purple-400 font-bold">•</span>
+              <span><b>Càrrega Nuclear Efectiva (Z<sub>eff</sub>):</b> Es manté pràcticament constant en baixar en un grup.</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-purple-400 font-bold">•</span>
+              <span><b>Nombre quàntic principal (<i>n</i>):</b> Augmenta en baixar pel grup (més capes d'electrons).</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-purple-400 font-bold">•</span>
+              <span><b>Distància i Apantallament:</b> Els electrons externs estan més allunyats del nucli i més apantallats per les capes internes.</span>
+            </li>
+            <li class="flex items-start space-x-2">
+              <span class="text-purple-400 font-bold">•</span>
+              <span><b>Conclusió PAU:</b> En baixar en un grup, l'<b>atracció nuclear disminueix</b> a causa de l'increment de la distància al nucli (major <i>n</i>).</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- PROPIETATS INDIVIDUALS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Radi Atòmic -->
+        <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-6">
+          <h3 class="text-md font-bold text-emerald-400 mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-circle-dot"></i>
+            <span>Radi Atòmic</span>
+          </h3>
+          <p class="text-xs text-slate-300 mb-3">Distància mitjana des del nucli fins a l'electró més extern de la capa de valència.</p>
+          <div class="p-3 bg-slate-900 rounded-xl text-xs space-y-2 font-mono text-slate-300">
+            <div>• <b>A un grup (↓):</b> Augmenta en baixar (major <i>n</i>).</div>
+            <div>• <b>A un període (→):</b> Disminueix cap a la dreta (major Z<sub>eff</sub> comprimeix el núvol).</div>
+          </div>
+        </div>
+
+        <!-- Energia d'Ionització -->
+        <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-6">
+          <h3 class="text-md font-bold text-amber-400 mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-bolt"></i>
+            <span>Energia d'Ionització (EI₁)</span>
+          </h3>
+          <p class="text-xs text-slate-300 mb-3">Energia mínima necessària per extreure un electró d'un àtom neutre en estat gasós: X(g) + EI → X⁺(g) + e⁻</p>
+          <div class="p-3 bg-slate-900 rounded-xl text-xs space-y-2 font-mono text-slate-300">
+            <div>• <b>A un grup (↓):</b> Disminueix en baixar (electrons més allunyats del nucli).</div>
+            <div>• <b>A un període (→):</b> Augmenta cap a la dreta (major Z<sub>eff</sub> requereix més energia).</div>
+          </div>
+        </div>
+
+        <!-- Electronegativitat -->
+        <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-6">
+          <h3 class="text-md font-bold text-cyan-400 mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-magnet"></i>
+            <span>Electronegativitat (EN)</span>
+          </h3>
+          <p class="text-xs text-slate-300 mb-3">Tendència d'un àtom a atraure cap a si el parell d'electrons d'un enllaç químic covalent. (Grup 18 exclòs).</p>
+          <div class="p-3 bg-slate-900 rounded-xl text-xs space-y-2 font-mono text-slate-300">
+            <div>• <b>A un grup (↓):</b> Disminueix en baixar.</div>
+            <div>• <b>A un període (→):</b> Augmenta cap a la dreta.</div>
+          </div>
+        </div>
+
+        <!-- Afinitat Electrònica -->
+        <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-6">
+          <h3 class="text-md font-bold text-pink-400 mb-2 flex items-center space-x-2">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Afinitat Electrònica (AE)</span>
+          </h3>
+          <p class="text-xs text-slate-300 mb-3">Canvi d'energia quan un àtom gasós capta un electró: X(g) + e⁻ → X⁻(g) + AE. (Grup 18 exclòs).</p>
+          <div class="p-3 bg-slate-900 rounded-xl text-xs space-y-2 font-mono text-slate-300">
+            <div>• <b>A un grup (↓):</b> Disminueix en baixar (en magnitud).</div>
+            <div>• <b>A un període (→):</b> Augmenta cap a la dreta (més exotèrmica / més tendència).</div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================== PESTANYA 3: TAULA PERIÒDICA I CERCADOR ==================== -->
+    <section id="section-table" class="hidden space-y-6">
+      
+      <div class="bg-cardbg border border-slate-700/60 rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
+        
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-white">Taula Periòdica Interactiva</h2>
+            <p class="text-xs text-slate-400">Explora les propietats numèriques i consulta la informació de cada element.</p>
+          </div>
+
+          <!-- Controls de la taula -->
+          <div class="flex flex-wrap items-center gap-3">
+            <input type="text" id="table-search" oninput="filterTable()" placeholder="Cerca element o Z..." class="bg-slate-900 text-sm text-slate-200 border border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500 w-44">
+            
+            <select id="heatmap-property" onchange="renderFullTable()" class="bg-slate-900 text-sm text-slate-200 border border-slate-700 rounded-xl px-3 py-1.5 focus:outline-none focus:border-emerald-500">
+              <option value="none">Color per Blocs/Grups</option>
+              <option value="radius">Mapa de calor: Radi Atòmic</option>
+              <option value="ie">Mapa de calor: Energia Ionització</option>
+              <option value="en">Mapa de calor: Electronegativitat</option>
+              <option value="ea">Mapa de calor: Afinitat Electrònica</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- REIXETA TAULA PERIÒDICA MIDA COMPLETA -->
+        <div class="overflow-x-auto pb-4 pt-2">
+          <div id="full-ptable" class="ptable-grid min-w-[750px]">
+            <!-- Es renderitza per JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DETALLS DE L'ELEMENT SELECCIONAT -->
+      <div id="element-detail-card" class="bg-cardbg border border-slate-700/60 rounded-2xl p-6 shadow-xl hidden">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center space-x-6">
+            <div id="detail-box" class="w-24 h-24 rounded-2xl flex flex-col items-center justify-center font-bold text-white shadow-lg">
+              <span id="detail-z" class="text-xs opacity-80">Z=--</span>
+              <span id="detail-symbol" class="text-3xl">--</span>
+            </div>
+            <div>
+              <h3 id="detail-name" class="text-2xl font-bold text-white">--</h3>
+              <p id="detail-category" class="text-xs text-emerald-400 font-semibold uppercase tracking-wider mt-0.5">--</p>
+              <p id="detail-config" class="text-xs text-slate-300 font-mono mt-2">Configuració: --</p>
+            </div>
+          </div>
+          <button onclick="closeDetailCard()" class="text-slate-400 hover:text-white p-2">
+            <i class="fa-solid fa-xmark text-xl"></i>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-700/60 text-center">
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block">Radi Atòmic</span>
+            <span id="detail-radius" class="text-lg font-bold text-emerald-400">--</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block">1a Energia Ionització</span>
+            <span id="detail-ie" class="text-lg font-bold text-amber-400">--</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block">Electronegativitat</span>
+            <span id="detail-en" class="text-lg font-bold text-cyan-400">--</span>
+          </div>
+          <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-xs text-slate-400 block">Afinitat Electrònica</span>
+            <span id="detail-ea" class="text-lg font-bold text-pink-400">--</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>Desenvolupat per a la preparació de les Proves d'Accés a la Universitat (PAU) • Química de 2n de Batxillerat</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT BASE DE DADES I LÒGICA -->
+  <script>
+    /* ==========================================================================
+       1. BASE DE DADES DELS 118 ELEMENTS DE LA TAULA PERIÒDICA
+       ========================================================================== */
+    const ELEMENTS = [
+      { z: 1, symbol: 'H', name: 'Hidrogen', group: 1, period: 1, category: 'no-metall', radius: 37, ie: 1312, en: 2.20, ea: 73, config: '1s¹' },
+      { z: 2, symbol: 'He', name: 'Heli', group: 18, period: 1, category: 'gas-noble', radius: 32, ie: 2372, en: null, ea: 0, config: '1s²' },
+      
+      { z: 3, symbol: 'Li', name: 'Liti', group: 1, period: 2, category: 'alcali', radius: 152, ie: 520, en: 0.98, ea: 60, config: '[He] 2s¹' },
+      { z: 4, symbol: 'Be', name: 'Beril·li', group: 2, period: 2, category: 'alcalinoterrat', radius: 112, ie: 899, en: 1.57, ea: 0, config: '[He] 2s²' },
+      { z: 5, symbol: 'B', name: 'Bor', group: 13, period: 2, category: 'metal·loide', radius: 85, ie: 801, en: 2.04, ea: 27, config: '[He] 2s² 2p¹' },
+      { z: 6, symbol: 'C', name: 'Carboni', group: 14, period: 2, category: 'no-metall', radius: 77, ie: 1086, en: 2.55, ea: 122, config: '[He] 2s² 2p²' },
+      { z: 7, symbol: 'N', name: 'Nitrogen', group: 15, period: 2, category: 'no-metall', radius: 75, ie: 1402, en: 3.04, ea: 7, config: '[He] 2s² 2p³' },
+      { z: 8, symbol: 'O', name: 'Oxigen', group: 16, period: 2, category: 'no-metall', radius: 73, ie: 1314, en: 3.44, ea: 141, config: '[He] 2s² 2p⁴' },
+      { z: 9, symbol: 'F', name: 'Fluor', group: 17, period: 2, category: 'halogen', radius: 71, ie: 1681, en: 3.98, ea: 328, config: '[He] 2s² 2p⁵' },
+      { z: 10, symbol: 'Ne', name: 'Neó', group: 18, period: 2, category: 'gas-noble', radius: 69, ie: 2081, en: null, ea: 0, config: '[He] 2s² 2p⁶' },
+      
+      { z: 11, symbol: 'Na', name: 'Sodi', group: 1, period: 3, category: 'alcali', radius: 186, ie: 496, en: 0.93, ea: 53, config: '[Ne] 3s¹' },
+      { z: 12, symbol: 'Mg', name: 'Magnesi', group: 2, period: 3, category: 'alcalinoterrat', radius: 160, ie: 738, en: 1.31, ea: 0, config: '[Ne] 3s²' },
+      { z: 13, symbol: 'Al', name: 'Alumini', group: 13, period: 3, category: 'metall-transicio', radius: 143, ie: 578, en: 1.61, ea: 43, config: '[Ne] 3s² 3p¹' },
+      { z: 14, symbol: 'Si', name: 'Silici', group: 14, period: 3, category: 'metal·loide', radius: 118, ie: 787, en: 1.90, ea: 134, config: '[Ne] 3s² 3p²' },
+      { z: 15, symbol: 'P', name: 'Fòsfor', group: 15, period: 3, category: 'no-metall', radius: 110, ie: 1012, en: 2.19, ea: 72, config: '[Ne] 3s² 3p³' },
+      { z: 16, symbol: 'S', name: 'Sofre', group: 16, period: 3, category: 'no-metall', radius: 103, ie: 1000, en: 2.58, ea: 200, config: '[Ne] 3s² 3p⁴' },
+      { z: 17, symbol: 'Cl', name: 'Clor', group: 17, period: 3, category: 'halogen', radius: 99, ie: 1251, en: 3.16, ea: 349, config: '[Ne] 3s² 3p⁵' },
+      { z: 18, symbol: 'Ar', name: 'Argó', group: 18, period: 3, category: 'gas-noble', radius: 97, ie: 1521, en: null, ea: 0, config: '[Ne] 3s² 3p⁶' },
+
+      { z: 19, symbol: 'K', name: 'Potassi', group: 1, period: 4, category: 'alcali', radius: 227, ie: 419, en: 0.82, ea: 48, config: '[Ar] 4s¹' },
+      { z: 20, symbol: 'Ca', name: 'Calci', group: 2, period: 4, category: 'alcalinoterrat', radius: 197, ie: 590, en: 1.00, ea: 2, config: '[Ar] 4s²' },
+      { z: 21, symbol: 'Sc', name: 'Escandi', group: 3, period: 4, category: 'metall-transicio', radius: 162, ie: 633, en: 1.36, ea: 18, config: '[Ar] 3d¹ 4s²' },
+      { z: 22, symbol: 'Ti', name: 'Titani', group: 4, period: 4, category: 'metall-transicio', radius: 147, ie: 658, en: 1.54, ea: 8, config: '[Ar] 3d² 4s²' },
+      { z: 23, symbol: 'V', name: 'Vanadi', group: 5, period: 4, category: 'metall-transicio', radius: 134, ie: 651, en: 1.63, ea: 51, config: '[Ar] 3d³ 4s²' },
+      { z: 24, symbol: 'Cr', name: 'Crom', group: 6, period: 4, category: 'metall-transicio', radius: 128, ie: 653, en: 1.66, ea: 65, config: '[Ar] 3d⁵ 4s¹' },
+      { z: 25, symbol: 'Mn', name: 'Manganès', group: 7, period: 4, category: 'metall-transicio', radius: 127, ie: 717, en: 1.55, ea: 0, config: '[Ar] 3d⁵ 4s²' },
+      { z: 26, symbol: 'Fe', name: 'Ferro', group: 8, period: 4, category: 'metall-transicio', radius: 126, ie: 762, en: 1.83, ea: 15, config: '[Ar] 3d⁶ 4s²' },
+      { z: 27, symbol: 'Co', name: 'Cobalt', group: 9, period: 4, category: 'metall-transicio', radius: 125, ie: 760, en: 1.88, ea: 64, config: '[Ar] 3d⁷ 4s²' },
+      { z: 28, symbol: 'Ni', name: 'Níquel', group: 10, period: 4, category: 'metall-transicio', radius: 124, ie: 737, en: 1.91, ea: 112, config: '[Ar] 3d⁸ 4s²' },
+      { z: 29, symbol: 'Cu', name: 'Coure', group: 11, period: 4, category: 'metall-transicio', radius: 128, ie: 745, en: 1.90, ea: 119, config: '[Ar] 3d¹⁰ 4s¹' },
+      { z: 30, symbol: 'Zn', name: 'Sinc', group: 12, period: 4, category: 'metall-transicio', radius: 134, ie: 906, en: 1.65, ea: 0, config: '[Ar] 3d¹⁰ 4s²' },
+      { z: 31, symbol: 'Ga', name: 'Gal·li', group: 13, period: 4, category: 'metall-transicio', radius: 135, ie: 579, en: 1.81, ea: 29, config: '[Ar] 3d¹⁰ 4s² 4p¹' },
+      { z: 32, symbol: 'Ge', name: 'Germani', group: 14, period: 4, category: 'metal·loide', radius: 122, ie: 762, en: 2.01, ea: 119, config: '[Ar] 3d¹⁰ 4s² 4p²' },
+      { z: 33, symbol: 'As', name: 'Arsènic', group: 15, period: 4, category: 'metal·loide', radius: 119, ie: 947, en: 2.18, ea: 78, config: '[Ar] 3d¹⁰ 4s² 4p³' },
+      { z: 34, symbol: 'Se', name: 'Seleni', group: 16, period: 4, category: 'no-metall', radius: 120, ie: 941, en: 2.55, ea: 195, config: '[Ar] 3d¹⁰ 4s² 4p⁴' },
+      { z: 35, symbol: 'Br', name: 'Brom', group: 17, period: 4, category: 'halogen', radius: 114, ie: 1140, en: 2.96, ea: 325, config: '[Ar] 3d¹⁰ 4s² 4p⁵' },
+      { z: 36, symbol: 'Kr', name: 'Kriptó', group: 18, period: 4, category: 'gas-noble', radius: 112, ie: 1351, en: 3.00, ea: 0, config: '[Ar] 3d¹⁰ 4s² 4p⁶' },
+
+      { z: 37, symbol: 'Rb', name: 'Rubidi', group: 1, period: 5, category: 'alcali', radius: 248, ie: 403, en: 0.82, ea: 47, config: '[Kr] 5s¹' },
+      { z: 38, symbol: 'Sr', name: 'Estronci', group: 2, period: 5, category: 'alcalinoterrat', radius: 215, ie: 549, en: 0.95, ea: 5, config: '[Kr] 5s²' },
+      { z: 39, symbol: 'Y', name: 'Itri', group: 3, period: 5, category: 'metall-transicio', radius: 180, ie: 600, en: 1.22, ea: 30, config: '[Kr] 4d¹ 5s²' },
+      { z: 40, symbol: 'Zr', name: 'Zirconi', group: 4, period: 5, category: 'metall-transicio', radius: 160, ie: 640, en: 1.33, ea: 41, config: '[Kr] 4d² 5s²' },
+      { z: 41, symbol: 'Nb', name: 'Niobi', group: 5, period: 5, category: 'metall-transicio', radius: 146, ie: 652, en: 1.6, ea: 86, config: '[Kr] 4d⁴ 5s¹' },
+      { z: 42, symbol: 'Mo', name: 'Molibdè', group: 6, period: 5, category: 'metall-transicio', radius: 139, ie: 684, en: 2.16, ea: 72, config: '[Kr] 4d⁵ 5s¹' },
+      { z: 43, symbol: 'Tc', name: 'Tecneci', group: 7, period: 5, category: 'metall-transicio', radius: 136, ie: 702, en: 1.9, ea: 53, config: '[Kr] 4d⁵ 5s²' },
+      { z: 44, symbol: 'Ru', name: 'Ruteni', group: 8, period: 5, category: 'metall-transicio', radius: 134, ie: 710, en: 2.2, ea: 101, config: '[Kr] 4d⁷ 5s¹' },
+      { z: 45, symbol: 'Rh', name: 'Rodi', group: 9, period: 5, category: 'metall-transicio', radius: 134, ie: 720, en: 2.28, ea: 110, config: '[Kr] 4d⁸ 5s¹' },
+      { z: 46, symbol: 'Pd', name: 'Pal·ladi', group: 10, period: 5, category: 'metall-transicio', radius: 137, ie: 804, en: 2.20, ea: 54, config: '[Kr] 4d¹⁰' },
+      { z: 47, symbol: 'Ag', name: 'Plata', group: 11, period: 5, category: 'metall-transicio', radius: 144, ie: 731, en: 1.93, ea: 126, config: '[Kr] 4d¹⁰ 5s¹' },
+      { z: 48, symbol: 'Cd', name: 'Cadmi', group: 12, period: 5, category: 'metall-transicio', radius: 151, ie: 868, en: 1.69, ea: 0, config: '[Kr] 4d¹⁰ 5s²' },
+      { z: 49, symbol: 'In', name: 'Indi', group: 13, period: 5, category: 'metall-transicio', radius: 167, ie: 558, en: 1.78, ea: 29, config: '[Kr] 4d¹⁰ 5s² 5p¹' },
+      { z: 50, symbol: 'Sn', name: 'Llauna', group: 14, period: 5, category: 'metall-transicio', radius: 140, ie: 708, en: 1.96, ea: 107, config: '[Kr] 4d¹⁰ 5s² 5p²' },
+      { z: 51, symbol: 'Sb', name: 'Antimoni', group: 15, period: 5, category: 'metal·loide', radius: 140, ie: 834, en: 2.05, ea: 103, config: '[Kr] 4d¹⁰ 5s² 5p³' },
+      { z: 52, symbol: 'Te', name: 'Tel·luri', group: 16, period: 5, category: 'metal·loide', radius: 142, ie: 869, en: 2.10, ea: 190, config: '[Kr] 4d¹⁰ 5s² 5p⁴' },
+      { z: 53, symbol: 'I', name: 'Iode', group: 17, period: 5, category: 'halogen', radius: 133, ie: 1008, en: 2.66, ea: 295, config: '[Kr] 4d¹⁰ 5s² 5p⁵' },
+      { z: 54, symbol: 'Xe', name: 'Xenó', group: 18, period: 5, category: 'gas-noble', radius: 131, ie: 1170, en: 2.6, ea: 0, config: '[Kr] 4d¹⁰ 5s² 5p⁶' },
+
+      { z: 55, symbol: 'Cs', name: 'Cesi', group: 1, period: 6, category: 'alcali', radius: 265, ie: 376, en: 0.79, ea: 46, config: '[Xe] 6s¹' },
+      { z: 56, symbol: 'Ba', name: 'Bari', group: 2, period: 6, category: 'alcalinoterrat', radius: 222, ie: 503, en: 0.89, ea: 14, config: '[Xe] 6s²' },
+      
+      // Lantànids (57-71)
+      { z: 57, symbol: 'La', name: 'Lantà', group: 3, period: 6, category: 'lantanid', radius: 187, ie: 538, en: 1.10, ea: 48, config: '[Xe] 5d¹ 6s²' },
+      { z: 58, symbol: 'Ce', name: 'Ceri', group: 3, period: 6, category: 'lantanid', radius: 181, ie: 534, en: 1.12, ea: 50, config: '[Xe] 4f¹ 5d¹ 6s²' },
+      { z: 59, symbol: 'Pr', name: 'Praseodimi', group: 3, period: 6, category: 'lantanid', radius: 182, ie: 527, en: 1.13, ea: 50, config: '[Xe] 4f³ 6s²' },
+      { z: 60, symbol: 'Nd', name: 'Neodimi', group: 3, period: 6, category: 'lantanid', radius: 181, ie: 533, en: 1.14, ea: 50, config: '[Xe] 4f⁴ 6s²' },
+      { z: 61, symbol: 'Pm', name: 'Prometi', group: 3, period: 6, category: 'lantanid', radius: 180, ie: 540, en: 1.13, ea: 50, config: '[Xe] 4f⁵ 6s²' },
+      { z: 62, symbol: 'Sm', name: 'Samari', group: 3, period: 6, category: 'lantanid', radius: 180, ie: 545, en: 1.17, ea: 50, config: '[Xe] 4f⁶ 6s²' },
+      { z: 63, symbol: 'Eu', name: 'Europi', group: 3, period: 6, category: 'lantanid', radius: 199, ie: 547, en: 1.20, ea: 50, config: '[Xe] 4f⁷ 6s²' },
+      { z: 64, symbol: 'Gd', name: 'Gadolini', group: 3, period: 6, category: 'lantanid', radius: 179, ie: 593, en: 1.20, ea: 50, config: '[Xe] 4f⁷ 5d¹ 6s²' },
+      { z: 65, symbol: 'Tb', name: 'Terbi', group: 3, period: 6, category: 'lantanid', radius: 180, ie: 566, en: 1.20, ea: 50, config: '[Xe] 4f⁹ 6s²' },
+      { z: 66, symbol: 'Dy', name: 'Disprosi', group: 3, period: 6, category: 'lantanid', radius: 178, ie: 573, en: 1.22, ea: 50, config: '[Xe] 4f¹⁰ 6s²' },
+      { z: 67, symbol: 'Ho', name: 'Holmi', group: 3, period: 6, category: 'lantanid', radius: 176, ie: 581, en: 1.23, ea: 50, config: '[Xe] 4f¹¹ 6s²' },
+      { z: 68, symbol: 'Er', name: 'Erbi', group: 3, period: 6, category: 'lantanid', radius: 176, ie: 589, en: 1.24, ea: 50, config: '[Xe] 4f¹² 6s²' },
+      { z: 69, symbol: 'Tm', name: 'Tuli', group: 3, period: 6, category: 'lantanid', radius: 176, ie: 597, en: 1.25, ea: 99, config: '[Xe] 4f¹³ 6s²' },
+      { z: 70, symbol: 'Yb', name: 'Iterbi', group: 3, period: 6, category: 'lantanid', radius: 174, ie: 603, en: 1.10, ea: 50, config: '[Xe] 4f¹⁴ 6s²' },
+      { z: 71, symbol: 'Lu', name: 'Luteci', group: 3, period: 6, category: 'lantanid', radius: 173, ie: 523, en: 1.27, ea: 50, config: '[Xe] 4f¹⁴ 5d¹ 6s²' },
+
+      { z: 72, symbol: 'Hf', name: 'Hafni', group: 4, period: 6, category: 'metall-transicio', radius: 159, ie: 658, en: 1.3, ea: 0, config: '[Xe] 4f¹⁴ 5d² 6s²' },
+      { z: 73, symbol: 'Ta', name: 'Tàntal', group: 5, period: 6, category: 'metall-transicio', radius: 146, ie: 761, en: 1.5, ea: 31, config: '[Xe] 4f¹⁴ 5d³ 6s²' },
+      { z: 74, symbol: 'W', name: 'Tungstè', group: 6, period: 6, category: 'metall-transicio', radius: 139, ie: 770, en: 2.36, ea: 79, config: '[Xe] 4f¹⁴ 5d⁴ 6s²' },
+      { z: 75, symbol: 'Re', name: 'Reni', group: 7, period: 6, category: 'metall-transicio', radius: 137, ie: 760, en: 1.9, ea: 14, config: '[Xe] 4f¹⁴ 5d⁵ 6s²' },
+      { z: 76, symbol: 'Os', name: 'Osmi', group: 8, period: 6, category: 'metall-transicio', radius: 135, ie: 840, en: 2.2, ea: 106, config: '[Xe] 4f¹⁴ 5d⁶ 6s²' },
+      { z: 77, symbol: 'Ir', name: 'Iradi', group: 9, period: 6, category: 'metall-transicio', radius: 136, ie: 880, en: 2.2, ea: 151, config: '[Xe] 4f¹⁴ 5d⁷ 6s²' },
+      { z: 78, symbol: 'Pt', name: 'Platí', group: 10, period: 6, category: 'metall-transicio', radius: 139, ie: 870, en: 2.28, ea: 205, config: '[Xe] 4f¹⁴ 5d⁹ 6s¹' },
+      { z: 79, symbol: 'Au', name: 'Or', group: 11, period: 6, category: 'metall-transicio', radius: 144, ie: 890, en: 2.54, ea: 223, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s¹' },
+      { z: 80, symbol: 'Hg', name: 'Mercuri', group: 12, period: 6, category: 'metall-transicio', radius: 151, ie: 1007, en: 2.00, ea: 0, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s²' },
+      { z: 81, symbol: 'Tl', name: 'Tal·li', group: 13, period: 6, category: 'metall-transicio', radius: 170, ie: 589, en: 1.62, ea: 19, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹' },
+      { z: 82, symbol: 'Pb', name: 'Plom', group: 14, period: 6, category: 'metall-transicio', radius: 146, ie: 715, en: 2.33, ea: 35, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²' },
+      { z: 83, symbol: 'Bi', name: 'Bismut', group: 15, period: 6, category: 'metall-transicio', radius: 150, ie: 703, en: 2.02, ea: 91, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³' },
+      { z: 84, symbol: 'Po', name: 'Poloni', group: 16, period: 6, category: 'metal·loide', radius: 168, ie: 812, en: 2.0, ea: 183, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴' },
+      { z: 85, symbol: 'At', name: 'Astat', group: 17, period: 6, category: 'halogen', radius: 140, ie: 920, en: 2.2, ea: 270, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵' },
+      { z: 86, symbol: 'Rn', name: 'Radó', group: 18, period: 6, category: 'gas-noble', radius: 140, ie: 1037, en: null, ea: 0, config: '[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶' },
+
+      { z: 87, symbol: 'Fr', name: 'Franci', group: 1, period: 7, category: 'alcali', radius: 280, ie: 380, en: 0.70, ea: 46, config: '[Rn] 7s¹' },
+      { z: 88, symbol: 'Ra', name: 'Radi', group: 2, period: 7, category: 'alcalinoterrat', radius: 223, ie: 509, en: 0.90, ea: 10, config: '[Rn] 7s²' },
+      
+      // Actínids (89-103)
+      { z: 89, symbol: 'Ac', name: 'Actini', group: 3, period: 7, category: 'actinid', radius: 188, ie: 499, en: 1.10, ea: 35, config: '[Rn] 6d¹ 7s²' },
+      { z: 90, symbol: 'Th', name: 'Tori', group: 3, period: 7, category: 'actinid', radius: 180, ie: 587, en: 1.30, ea: 50, config: '[Rn] 6d² 7s²' },
+      { z: 91, symbol: 'Pa', name: 'Protactini', group: 3, period: 7, category: 'actinid', radius: 161, ie: 568, en: 1.50, ea: 50, config: '[Rn] 5f² 6d¹ 7s²' },
+      { z: 92, symbol: 'U', name: 'Urani', group: 3, period: 7, category: 'actinid', radius: 156, ie: 597, en: 1.38, ea: 50, config: '[Rn] 5f³ 6d¹ 7s²' },
+      { z: 93, symbol: 'Np', name: 'Neptuni', group: 3, period: 7, category: 'actinid', radius: 156, ie: 604, en: 1.36, ea: 50, config: '[Rn] 5f⁴ 6d¹ 7s²' },
+      { z: 94, symbol: 'Pu', name: 'Plutoni', group: 3, period: 7, category: 'actinid', radius: 156, ie: 585, en: 1.28, ea: 50, config: '[Rn] 5f⁶ 7s²' },
+      { z: 95, symbol: 'Am', name: 'Americi', group: 3, period: 7, category: 'actinid', radius: 173, ie: 578, en: 1.13, ea: 50, config: '[Rn] 5f⁷ 7s²' },
+      { z: 96, symbol: 'Cm', name: 'Curi', group: 3, period: 7, category: 'actinid', radius: 169, ie: 581, en: 1.28, ea: 50, config: '[Rn] 5f⁷ 6d¹ 7s²' },
+      { z: 97, symbol: 'Bk', name: 'Berkeli', group: 3, period: 7, category: 'actinid', radius: 168, ie: 601, en: 1.30, ea: 50, config: '[Rn] 5f⁹ 7s²' },
+      { z: 98, symbol: 'Cf', name: 'Californi', group: 3, period: 7, category: 'actinid', radius: 168, ie: 608, en: 1.30, ea: 50, config: '[Rn] 5f¹⁰ 7s²' },
+      { z: 99, symbol: 'Es', name: 'Einsteni', group: 3, period: 7, category: 'actinid', radius: 165, ie: 619, en: 1.30, ea: 50, config: '[Rn] 5f¹¹ 7s²' },
+      { z: 100, symbol: 'Fm', name: 'Fermi', group: 3, period: 7, category: 'actinid', radius: 167, ie: 627, en: 1.30, ea: 50, config: '[Rn] 5f¹² 7s²' },
+      { z: 101, symbol: 'Md', name: 'Mendelevi', group: 3, period: 7, category: 'actinid', radius: 173, ie: 635, en: 1.30, ea: 50, config: '[Rn] 5f¹³ 7s²' },
+      { z: 102, symbol: 'No', name: 'Nobeli', group: 3, period: 7, category: 'actinid', radius: 176, ie: 642, en: 1.30, ea: 50, config: '[Rn] 5f¹⁴ 7s²' },
+      { z: 103, symbol: 'Lr', name: 'Lawrenci', group: 3, period: 7, category: 'actinid', radius: 161, ie: 470, en: 1.30, ea: 50, config: '[Rn] 5f¹⁴ 6d¹ 7s²' }
+    ];
+
+    /* ==========================================================================
+       2. ESTAT DE L'APLICACIÓ I VARIABLES GLOBALS
+       ========================================================================== */
+    let score = { correct: 0, total: 0, streak: 0 };
+    let currentQuestion = null;
+    let answerChecked = false;
+
+    const PROPERTY_NAMES = {
+      radius: "Radi Atòmic",
+      ie: "Energia d'Ionització",
+      en: "Electronegativitat",
+      ea: "Afinitat Electrònica"
+    };
+
+    const PROPERTY_UNITS = {
+      radius: "pm",
+      ie: "kJ/mol",
+      en: "(escala Pauling)",
+      ea: "kJ/mol"
+    };
+
+    /* ==========================================================================
+       3. GENERACIÓ DE PREGUNTES SENSE AMBIGÜITAT (SENSE BUCLES INFINITS)
+       ========================================================================== */
+    function generateQuestion() {
+      answerChecked = false;
+
+      // Amagar feedback antic
+      const feedbackContainer = document.getElementById('feedback-container');
+      feedbackContainer.classList.add('hidden');
+
+      // Netejar badges dels botons
+      document.getElementById('badge-choice-a').className = 'hidden';
+      document.getElementById('badge-choice-b').className = 'hidden';
+      document.getElementById('btn-elem-a').className = "group relative bg-slate-900/90 hover:bg-slate-800/90 border-2 border-slate-700 hover:border-blue-500 rounded-2xl p-6 text-left transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-6";
+      document.getElementById('btn-elem-b').className = "group relative bg-slate-900/90 hover:bg-slate-800/90 border-2 border-slate-700 hover:border-pink-500 rounded-2xl p-6 text-left transition-all transform hover:-translate-y-1 shadow-lg flex items-center space-x-6";
+
+      const propFilter = document.getElementById('propFilter').value;
+      const modeFilter = document.getElementById('modeFilter').value;
+
+      // Triem propietat
+      let selectedProp = propFilter;
+      if (selectedProp === 'random') {
+        const props = ['radius', 'ie', 'en', 'ea'];
+        selectedProp = props[Math.floor(Math.random() * props.length)];
+      }
+
+      // Filtrem elements elegibles (excloem lantànids/actínids per a preguntes estàndard, i gasos nobles per EN/AE)
+      const eligibleElements = ELEMENTS.filter(e => {
+        if (e.z >= 57 && e.z <= 71) return false;
+        if (e.z >= 89 && e.z <= 103) return false;
+        if ((selectedProp === 'en' || selectedProp === 'ea') && e.group === 18) return false;
+        return true;
+      });
+
+      let elemA = null;
+      let candidatesB = [];
+
+      // Selecció segura d'àtom A i àtom B
+      let attempts = 0;
+      while (attempts < 300 && candidatesB.length === 0) {
+        attempts++;
+        elemA = eligibleElements[Math.floor(Math.random() * eligibleElements.length)];
+
+        candidatesB = eligibleElements.filter(e => {
+          if (e.z === elemA.z) return false;
+
+          if (modeFilter === 'group') {
+            return e.group === elemA.group;
+          } else if (modeFilter === 'period') {
+            return e.period === elemA.period;
+          } else {
+            // Barrejat: MATEIX GRUP o MATEIX PERÍODE
+            return e.group === elemA.group || e.period === elemA.period;
+          }
+        });
+      }
+
+      if (candidatesB.length === 0) {
+        console.error("No s'han trobat parelles elegibles.");
+        return;
+      }
+
+      const elemB = candidatesB[Math.floor(Math.random() * candidatesB.length)];
+
+      // Determinar la relació exacta
+      const isSameGroup = (elemA.group === elemB.group);
+      const isSamePeriod = (elemA.period === elemB.period);
+      const relation = isSameGroup ? 'group' : 'period';
+
+      // Determinar quin àtom té el VALOR MAJOR teòric
+      let correctSymbol = '';
+      
+      if (selectedProp === 'radius') {
+        // Radi: Major en baixar al grup (major period) / Major a l'esquerra al període (menor group)
+        if (isSameGroup) {
+          correctSymbol = (elemA.period > elemB.period) ? elemA.symbol : elemB.symbol;
+        } else {
+          correctSymbol = (elemA.group < elemB.group) ? elemA.symbol : elemB.symbol;
+        }
+      } else {
+        // IE, EN, EA: Major en pujar al grup (menor period) / Major a la dreta al període (major group)
+        if (isSameGroup) {
+          correctSymbol = (elemA.period < elemB.period) ? elemA.symbol : elemB.symbol;
+        } else {
+          correctSymbol = (elemA.group > elemB.group) ? elemA.symbol : elemB.symbol;
+        }
+      }
+
+      currentQuestion = {
+        elemA,
+        elemB,
+        property: selectedProp,
+        relation,
+        correctSymbol
+      };
+
+      // Renderitzar UI de la pregunta
+      renderQuestionUI();
+      renderMiniTable();
+    }
+
+    function renderQuestionUI() {
+      const q = currentQuestion;
+      const propName = PROPERTY_NAMES[q.property];
+
+      // Títol exacte exigit
+      document.getElementById('question-text').textContent = `Quin d'aquests dos àtoms té un valor major de ${propName}?`;
+
+      // Badges
+      const relationBadge = document.getElementById('badge-relation');
+      if (q.relation === 'group') {
+        relationBadge.textContent = "Mateix Grup";
+        relationBadge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/30";
+      } else {
+        relationBadge.textContent = "Mateix Període";
+        relationBadge.className = "px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/30";
+      }
+
+      document.getElementById('badge-property').textContent = propName;
+
+      // Element A
+      document.getElementById('elem-a-z').textContent = `Z=${q.elemA.z}`;
+      document.getElementById('elem-a-symbol').textContent = q.elemA.symbol;
+      document.getElementById('elem-a-name').textContent = q.elemA.name;
+      document.getElementById('elem-a-pos').textContent = `Període ${q.elemA.period}, Grup ${q.elemA.group}`;
+      document.getElementById('elem-a-config').textContent = q.elemA.config;
+
+      // Element B
+      document.getElementById('elem-b-z').textContent = `Z=${q.elemB.z}`;
+      document.getElementById('elem-b-symbol').textContent = q.elemB.symbol;
+      document.getElementById('elem-b-name').textContent = q.elemB.name;
+      document.getElementById('elem-b-pos').textContent = `Període ${q.elemB.period}, Grup ${q.elemB.group}`;
+      document.getElementById('elem-b-config').textContent = q.elemB.config;
+    }
+
+    /* ==========================================================================
+       4. VERIFICACIÓ DE LA RESPOSTA I JUSTIFICACIÓ TEÒRICA PAU
+       ========================================================================== */
+    function checkAnswer(choice) {
+      if (answerChecked) return;
+      answerChecked = true;
+
+      const q = currentQuestion;
+      const chosenElem = (choice === 'A') ? q.elemA : q.elemB;
+      const isCorrect = (chosenElem.symbol === q.correctSymbol);
+
+      // Actualitzar Puntuació
+      score.total++;
+      if (isCorrect) {
+        score.correct++;
+        score.streak++;
+      } else {
+        score.streak = 0;
+      }
+      updateScoreboard();
+
+      // UI Badges als botons
+      const badgeA = document.getElementById('badge-choice-a');
+      const badgeB = document.getElementById('badge-choice-b');
+      badgeA.classList.remove('hidden');
+      badgeB.classList.remove('hidden');
+
+      if (q.elemA.symbol === q.correctSymbol) {
+        badgeA.innerHTML = '✔';
+        badgeA.className = "absolute top-3 right-3 text-xl font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-500";
+      } else {
+        badgeA.innerHTML = '✖';
+        badgeA.className = "absolute top-3 right-3 text-xl font-bold text-rose-400 bg-rose-950/80 px-2.5 py-1 rounded-full border border-rose-500";
+      }
+
+      if (q.elemB.symbol === q.correctSymbol) {
+        badgeB.innerHTML = '✔';
+        badgeB.className = "absolute top-3 right-3 text-xl font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-full border border-emerald-500";
+      } else {
+        badgeB.innerHTML = '✖';
+        badgeB.className = "absolute top-3 right-3 text-xl font-bold text-rose-400 bg-rose-950/80 px-2.5 py-1 rounded-full border border-rose-500";
+      }
+
+      // Destacar botó seleccionat
+      if (choice === 'A') {
+        document.getElementById('btn-elem-a').classList.add(isCorrect ? 'border-emerald-500' : 'border-rose-500');
+      } else {
+        document.getElementById('btn-elem-b').classList.add(isCorrect ? 'border-emerald-500' : 'border-rose-500');
+      }
+
+      // Generar Explicació Tipus PAU
+      showPAUExplanation(isCorrect, chosenElem);
+    }
+
+    function showPAUExplanation(isCorrect, chosenElem) {
+      const q = currentQuestion;
+      const propName = PROPERTY_NAMES[q.property];
+      const correctElem = (q.elemA.symbol === q.correctSymbol) ? q.elemA : q.elemB;
+
+      const container = document.getElementById('feedback-container');
+      const icon = document.getElementById('feedback-icon');
+      const title = document.getElementById('feedback-title');
+      const content = document.getElementById('feedback-content');
+      const dataBox = document.getElementById('feedback-data');
+
+      container.classList.remove('hidden');
+
+      if (isCorrect) {
+        container.className = "mt-8 max-w-3xl mx-auto rounded-2xl border p-6 transition-all bg-emerald-950/40 border-emerald-500/50";
+        icon.className = "text-2xl text-emerald-400";
+        icon.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        title.className = "text-lg font-bold text-emerald-400";
+        title.textContent = "Molt bé! Resposta Correcta";
+      } else {
+        container.className = "mt-8 max-w-3xl mx-auto rounded-2xl border p-6 transition-all bg-rose-950/40 border-rose-500/50";
+        icon.className = "text-2xl text-rose-400";
+        icon.innerHTML = '<i class="fa-solid fa-circle-xmark"></i>';
+        title.className = "text-lg font-bold text-rose-400";
+        title.textContent = `Incorrecte. L'àtom amb major ${propName} és el ${correctElem.name} (${correctElem.symbol}).`;
+      }
+
+      // Redacció de la Justificació Teòrica PAU
+      let justificationHTML = '';
+
+      if (q.relation === 'period') {
+        // Justificació Mateix Període (Z_eff)
+        justificationHTML = `
+          <div class="space-y-3">
+            <p class="font-semibold text-emerald-300"><b>1. Configuració i Posició:</b></p>
+            <p class="pl-4 text-slate-300">
+              Abdós elements pertanyen al <b>mateix període (${q.elemA.period})</b>. Tenen els electrons de valència al mateix nivell d'energia principal (<i>n</i> = ${q.elemA.period}).
+            </p>
+
+            <p class="font-semibold text-emerald-300"><b>2. Argumentació Teòrica PAU (Càrrega Nuclear Efectiva Z<sub>eff</sub>):</b></p>
+            <p class="pl-4 text-slate-300 leading-relaxed">
+              En avançar d'esquerra a dreta al llarg d'un període, augmenta el nombre d'protons al nucli (major càrrega nuclear <i>Z</i>). Com que els nous electrons s'incorporen a la mateixa capa de valència, l'efecte pantalla (<i>S</i>) d'aquesta capa és molt feble.
+              Per tant, la <b>càrrega nuclear efectiva (Z<sub>eff</sub> = Z - S) augmenta cap a la dreta</b>.
+            </p>
+
+            <p class="font-semibold text-emerald-300"><b>3. Conclusió per a ${propName}:</b></p>
+            <p class="pl-4 text-slate-300">
+              ${q.property === 'radius' 
+                ? `En augmentar Z<sub>eff</sub>, el nucli atreu els electrons externs amb més força, <b>comprimint el núvol electrònic</b>. Per tant, el radi atòmic <b>disminueix cap a la dreta</b>. Té un radi major l'element situat més a l'esquerra: <b>${correctElem.name} (${correctElem.symbol})</b>.`
+                : `En augmentar Z<sub>eff</sub>, els electrons estan més fortament atrets pel nucli. Per tant, requereix més energia extreure'ls o s'atrauen amb major intensitat cap a la dreta. Té un valor major l'element situat més a la dreta: <b>${correctElem.name} (${correctElem.symbol})</b>.`
+              }
+            </p>
+          </div>
+        `;
+      } else {
+        // Justificació Mateix Grup (n, distància i apantallament)
+        justificationHTML = `
+          <div class="space-y-3">
+            <p class="font-semibold text-purple-300"><b>1. Configuració i Posició:</b></p>
+            <p class="pl-4 text-slate-300">
+              Abdós elements pertanyen al <b>mateix grup (${q.elemA.group})</b>, per la qual cosa tenen una configuració electrònica de valència anàloga i una càrrega nuclear efectiva (Z<sub>eff</sub>) molt similar.
+            </p>
+
+            <p class="font-semibold text-purple-300"><b>2. Argumentació Teòrica PAU (Nombre Quàntic Principal <i>n</i>):</b></p>
+            <p class="pl-4 text-slate-300 leading-relaxed">
+              En baixar en un grup, augmenta el <b>nombre quàntic principal (<i>n</i>)</b>, la qual cosa significa que s'afegeixen capes electròniques internes completes. Això provoca un augment considerable de l'<b>efecte pantalla (<i>S</i>)</b> i de la distància mitjana entre els electrons externs i el nucli.
+            </p>
+
+            <p class="font-semibold text-purple-300"><b>3. Conclusió per a ${propName}:</b></p>
+            <p class="pl-4 text-slate-300">
+              ${q.property === 'radius' 
+                ? `En augmentar el nombre de capes (<i>n</i>), els electrons de valència estan més allunyats del nucli, de manera que el <b>radi atòmic augmenta en baixar en el grup</b>. Té un valor major l'element situat més avall: <b>${correctElem.name} (${correctElem.symbol})</b>.`
+                : `Com que els electrons externs estan més allunyats del nucli i més apantallats, l'atracció nuclear disminueix en baixar en el grup. Per tant, la ${propName} <b>disminueix en baixar</b>. Té un valor major l'element situat més amunt: <b>${correctElem.name} (${correctElem.symbol})</b>.`
+              }
+            </p>
+          </div>
+        `;
+      }
+
+      content.innerHTML = justificationHTML;
+
+      // Valors Experimentals Reals
+      const valA = q.elemA[q.property] !== null ? `${q.elemA[q.property]} ${PROPERTY_UNITS[q.property]}` : 'N/A';
+      const valB = q.elemB[q.property] !== null ? `${q.elemB[q.property]} ${PROPERTY_UNITS[q.property]}` : 'N/A';
+
+      dataBox.innerHTML = `
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+          <span class="text-slate-400 block">${q.elemA.symbol} (${q.elemA.name}):</span>
+          <span class="text-white font-bold text-sm">${valA}</span>
+        </div>
+        <div class="bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+          <span class="text-slate-400 block">${q.elemB.symbol} (${q.elemB.name}):</span>
+          <span class="text-white font-bold text-sm">${valB}</span>
+        </div>
+      `;
+    }
+
+    function updateScoreboard() {
+      document.getElementById('score-correct').textContent = score.correct;
+      document.getElementById('score-streak').textContent = `${score.streak} 🔥`;
+      const acc = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+      document.getElementById('score-accuracy').textContent = `${acc}%`;
+    }
+
+    function resetAndGenerate() {
+      generateQuestion();
+    }
+
+    /* ==========================================================================
+       5. TAULA PERIÒDICA DE SUPORT I COMPLETA
+       ========================================================================== */
+    function renderMiniTable() {
+      const container = document.getElementById('mini-ptable');
+      container.innerHTML = '';
+
+      const q = currentQuestion;
+
+      ELEMENTS.forEach(elem => {
+        const cell = document.createElement('div');
+        cell.className = 'element-cell bg-slate-800/60 border border-slate-700/50 text-slate-300';
+        cell.style.gridColumn = elem.group;
+        cell.style.gridRow = elem.period;
+
+        // Detecció Lantànids / Actínids a baix
+        if (elem.z >= 57 && elem.z <= 71) {
+          cell.style.gridRow = 9;
+          cell.style.gridColumn = elem.z - 57 + 3;
+        } else if (elem.z >= 89 && elem.z <= 103) {
+          cell.style.gridRow = 10;
+          cell.style.gridColumn = elem.z - 89 + 3;
+        }
+
+        // Destacar els dos àtoms del test
+        if (q && elem.symbol === q.elemA.symbol) {
+          cell.classList.add('compared-a');
+        } else if (q && elem.symbol === q.elemB.symbol) {
+          cell.classList.add('compared-b');
+        }
+
+        cell.innerHTML = `
+          <span class="font-bold">${elem.symbol}</span>
+        `;
+        container.appendChild(cell);
+      });
+    }
+
+    function renderFullTable() {
+      const container = document.getElementById('full-ptable');
+      container.innerHTML = '';
+
+      const heatmapProp = document.getElementById('heatmap-property').value;
+      const search = document.getElementById('table-search').value.toLowerCase().trim();
+
+      // Trobar valors min/max per al mapa de calor
+      let minVal = Infinity, maxVal = -Infinity;
+      if (heatmapProp !== 'none') {
+        ELEMENTS.forEach(e => {
+          const v = e[heatmapProp];
+          if (v !== null && v !== undefined) {
+            if (v < minVal) minVal = v;
+            if (v > maxVal) maxVal = v;
+          }
+        });
+      }
+
+      ELEMENTS.forEach(elem => {
+        const matchesSearch = !search || elem.symbol.toLowerCase().includes(search) || elem.name.toLowerCase().includes(search) || elem.z.toString() === search;
+
+        const cell = document.createElement('div');
+        cell.className = `element-cell border ${matchesSearch ? 'opacity-100' : 'opacity-20'}`;
+        cell.onclick = () => showElementDetail(elem);
+
+        // Posicionament Grid
+        cell.style.gridColumn = elem.group;
+        cell.style.gridRow = elem.period;
+
+        if (elem.z >= 57 && elem.z <= 71) {
+          cell.style.gridRow = 9;
+          cell.style.gridColumn = elem.z - 57 + 3;
+        } else if (elem.z >= 89 && elem.z <= 103) {
+          cell.style.gridRow = 10;
+          cell.style.gridColumn = elem.z - 89 + 3;
+        }
+
+        // Coloració per defecte o mapa de calor
+        if (heatmapProp === 'none') {
+          cell.classList.add(getCategoryClass(elem.category));
+        } else {
+          const val = elem[heatmapProp];
+          if (val === null || val === undefined) {
+            cell.style.backgroundColor = '#334155';
+            cell.style.color = '#94a3b8';
+          } else {
+            const ratio = (val - minVal) / (maxVal - minVal || 1);
+            // Gradient d'Esmeralda (baix) a Rosa/Vermell (alt)
+            const hue = (1 - ratio) * 160; 
+            cell.style.backgroundColor = `hsl(${hue}, 70%, 35%)`;
+            cell.style.color = 'white';
+          }
+        }
+
+        cell.innerHTML = `
+          <span class="text-[0.5rem] opacity-75 leading-none">${elem.z}</span>
+          <span class="font-extrabold text-xs">${elem.symbol}</span>
+        `;
+
+        container.appendChild(cell);
+      });
+    }
+
+    function getCategoryClass(cat) {
+      switch (cat) {
+        case 'alcali': return 'bg-rose-950/80 border-rose-600 text-rose-200';
+        case 'alcalinoterrat': return 'bg-amber-950/80 border-amber-600 text-amber-200';
+        case 'metall-transicio': return 'bg-slate-800 border-slate-600 text-slate-200';
+        case 'metal·loide': return 'bg-teal-950/80 border-teal-600 text-teal-200';
+        case 'no-metall': return 'bg-emerald-950/80 border-emerald-600 text-emerald-200';
+        case 'halogen': return 'bg-cyan-950/80 border-cyan-600 text-cyan-200';
+        case 'gas-noble': return 'bg-purple-950/80 border-purple-600 text-purple-200';
+        case 'lantanid': case 'actinid': return 'bg-indigo-950/80 border-indigo-600 text-indigo-200';
+        default: return 'bg-slate-800 border-slate-700 text-slate-300';
+      }
+    }
+
+    function filterTable() {
+      renderFullTable();
+    }
+
+    function showElementDetail(elem) {
+      const card = document.getElementById('element-detail-card');
+      card.classList.remove('hidden');
+
+      document.getElementById('detail-z').textContent = `Z = ${elem.z}`;
+      document.getElementById('detail-symbol').textContent = elem.symbol;
+      document.getElementById('detail-name').textContent = elem.name;
+      document.getElementById('detail-category').textContent = elem.category.replace('-', ' ');
+      document.getElementById('detail-config').textContent = `Configuració Electrònica: ${elem.config}`;
+
+      const box = document.getElementById('detail-box');
+      box.className = `w-24 h-24 rounded-2xl flex flex-col items-center justify-center font-bold text-white shadow-lg ${getCategoryClass(elem.category)}`;
+
+      document.getElementById('detail-radius').textContent = elem.radius ? `${elem.radius} pm` : 'N/A';
+      document.getElementById('detail-ie').textContent = elem.ie ? `${elem.ie} kJ/mol` : 'N/A';
+      document.getElementById('detail-en').textContent = elem.en ? `${elem.en}` : 'N/A';
+      document.getElementById('detail-ea').textContent = elem.ea !== null ? `${elem.ea} kJ/mol` : 'N/A';
+
+      card.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function closeDetailCard() {
+      document.getElementById('element-detail-card').classList.add('hidden');
+    }
+
+    /* ==========================================================================
+       6. GESTIÓ DE PESTANYES
+       ========================================================================== */
+    function switchTab(tab) {
+      const secQuiz = document.getElementById('section-quiz');
+      const secTheory = document.getElementById('section-theory');
+      const secTable = document.getElementById('section-table');
+
+      const btnQuiz = document.getElementById('tab-quiz');
+      const btnTheory = document.getElementById('tab-theory');
+      const btnTable = document.getElementById('tab-table');
+
+      // Amagar tot
+      secQuiz.classList.add('hidden');
+      secTheory.classList.add('hidden');
+      secTable.classList.add('hidden');
+
+      btnQuiz.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50";
+      btnTheory.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50";
+      btnTable.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 text-slate-300 hover:text-white hover:bg-slate-700/50";
+
+      if (tab === 'quiz') {
+        secQuiz.classList.remove('hidden');
+        btnQuiz.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-lg";
+      } else if (tab === 'theory') {
+        secTheory.classList.remove('hidden');
+        btnTheory.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-lg";
+      } else if (tab === 'table') {
+        secTable.classList.remove('hidden');
+        btnTable.className = "px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center space-x-2 bg-emerald-600 text-white shadow-lg";
+        renderFullTable();
+      }
+    }
+
+    /* INICIALITZACIÓ EN CARREGAR LA PÀGINA */
+    window.onload = function() {
+      generateQuestion();
+    };
+  </script>
+</body>
+</html>
